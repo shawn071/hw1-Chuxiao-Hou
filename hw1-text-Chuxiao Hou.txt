@@ -1,0 +1,148 @@
+1.
+The representation of the state:
+(can_left, miss_left, boat, can_right, miss_right)
+Number of missionaries on the left bank (can_left)
+Number of cannibals on the left bank (miss_left)
+the position of the boat (boat), a boolean value is used, True means the boat is on the left bank, False means the boat is on the right bank
+Number of missionaries on the right bank (can_right)
+Number of cannibals on the right bank (miss_right)
+
+Node representation:
+
+state: the state corresponding to the current node.
+parent_node: a pointer to the parent node of the current node (implemented in BFS and DFS implementations via path backtracking, and in IDS via recursive calls).
+action: the action from the parent node to the current node
+depth: the depth of the current node in the search tree or the cost to reach the current state from the initial state (controlled by recursive depth in DFS and IDS, by path length in BFS)。
+
+2.
+actions = [(2, 0), (1, 1), (0, 2), (1, 0), (0, 1)]
+This actions includes all possible move configurations:
+
+(2, 0): two cannibals, no missionaries.
+(1, 1): one cannibal and one missionary.
+(0, 2): no cannibals and two missionaries.
+(1, 0): one cannibal, no missionaries.
+(0, 1): no cannibals, one missionary.
+
+If the boat is on the left bank (boat == True), subtract the corresponding number of cannibals and missionaries from the left bank and add to the cannibals and missionaries on the right bank accordingly.
+If the boat is on the right bank (boat == False), the operation is reversed and the corresponding number is subtracted from the cannibals and missionaries on the right bank and added to the cannibals and missionaries on the left bank.
+
+3. Question a.
+I used three different search strategies: breadth-first search (BFS), depth-first search (DFS), and iterative deepening search (IDS).
+
+BFS: In this case BFS visits 16 nodes. Since BFS traverses the search tree hierarchically, it guarantees that the first solution found is the shortest. Therefore, the solution found by BFS in this case is optimal.
+
+Depth-first search (DFS): in this case DFS visits 14 nodes, the DFS algorithm explores each path, depth-first, until the goal state is reached or it is not possible to proceed further, the first solution found is not necessarily the shortest path.
+
+
+Iterative Deepening Search (IDS): in this case BFS visits 4506 nodes and finds a solution path of length 11 steps. Because it starts the search at the shallowest depth and deepens gradually, IDS finds the shortest path.
+
+3.Question b.
+A heuristic can be half the number of people on the left bank (rounded upwards, since only one person may need to be transported on the last move). It is assumed that this ratio will remain safe in any legitimate move.
+
+This heuristic is acceptable because it follows the basic principle of the heuristic that in the best case, two people can be transported on each boat move, and this heuristic gives the minimum number of boat trips required to reach the goal state.
+In this case A* visits 14 nodes and solution cost is 11, A* finds the shortest path.
+
+A* algorithm: the A* algorithm guarantees to find the optimal path from the initial state to the goal state.
+BFS: Breadth-first search also guarantees to find the shortest path but the space cost is too large.
+DFS: Depth-first search does not guarantee to find the shortest path.
+
+A* algorithm: A* algorithm visits far fewer nodes than the uninformative search algorithm, reducing the search space.
+BFS: Breadth-first search may need to explore every node in the search space (when the target state is located deep in the search tree)
+DFS: depth-first search may explore a large number of unnecessary paths (when the target state is difficult to find by direct deep exploration)
+
+5.
+Pseudo-code
+BFS(initial_state, goal_state):
+    Create a queue and enqueue the initial state
+    Create a set to track visited states
+    
+    while the queue is not empty:
+        current_state = dequeue from the queue
+        
+        if current_state is the goal_state:
+            return success and reconstruct path
+        
+        if current_state is not in visited:
+            Add current_state to visited
+            
+            for each successor of current_state:
+                if successor is not in visited:
+                    enqueue successor to the queue
+                    
+return failure
+
+Pseudo-code
+A*(initial_state, goal_state):
+    Create a priority queue and add the initial state with priority 0
+    came_from = map to track the path
+    cost_so_far = map with initial state cost 0
+    
+    while the priority queue is not empty:
+        current_state = dequeue the state with the lowest cost from the priority queue
+        
+        if current_state is the goal_state:
+            return success and reconstruct path
+        
+        for each successor of current_state:
+            new_cost = cost_so_far[current_state] + cost(current_state, successor)
+            if successor not in cost_so_far or new_cost < cost_so_far[successor]:
+                cost_so_far[successor] = new_cost
+                priority = new_cost + heuristic(successor)
+                enqueue successor in the priority queue with priority
+                came_from[successor] = current_state
+                
+    return failure
+
+
+6.
+BFS：
+Visited nodes: 16
+(3, 3, True, 0, 0)
+(1, 3, False, 2, 0)
+(2, 3, True, 1, 0)
+(0, 3, False, 3, 0)
+(1, 3, True, 2, 0)
+(1, 1, False, 2, 2)
+(2, 2, True, 1, 1)
+(2, 0, False, 1, 3)
+(3, 0, True, 0, 3)
+(1, 0, False, 2, 3)
+(2, 0, True, 1, 3)
+(0, 0, False, 3, 3)
+
+DFS：
+Visited nodes: 14
+(3, 3, True, 0, 0)
+(2, 2, False, 1, 1)
+(2, 3, True, 1, 0)
+(0, 3, False, 3, 0)
+(1, 3, True, 2, 0)
+(1, 1, False, 2, 2)
+(2, 2, True, 1, 1)
+(2, 0, False, 1, 3)
+(3, 0, True, 0, 3)
+(1, 0, False, 2, 3)
+(1, 1, True, 2, 2)
+(0, 0, False, 3, 3)
+
+IDS：
+Depth: 11, Visited Nodes: 4506
+(3, 3, True, 0, 0)
+(1, 3, False, 2, 0)
+(2, 3, True, 1, 0)
+(0, 3, False, 3, 0)
+(1, 3, True, 2, 0)
+(1, 1, False, 2, 2)
+(2, 2, True, 1, 1)
+(2, 0, False, 1, 3)
+(3, 0, True, 0, 3)
+(1, 0, False, 2, 3)
+(2, 0, True, 1, 3)
+(0, 0, False, 3, 3)
+
+A*：
+Visited Nodes: 14
+Solution Path: [(3, 3, 1, 0, 0), (2, 2, 0, 1, 1), (3, 2, 1, 0, 1), (3, 0, 0, 0, 3), (3, 1, 1, 0, 2), (1, 1, 0, 2, 2), (2, 2, 1, 1, 1), (0, 2, 0, 3, 1), (0, 3, 1, 3, 0), (0, 1, 0, 3, 2), (0, 2, 1, 3, 1), (0, 0, 0, 3, 3)]
+Solution Cost: 11
+
